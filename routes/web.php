@@ -1,21 +1,33 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MainController;
-use App\Http\Middleware\CheckIsLogged;
-use App\Http\Middleware\CheckIsNotLogged;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PlanoController;
 
-Route::middleware([CheckIsLogged::class])->group(function () {
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/', function () {
+    return view('welcome');
 });
 
+// =========================
+// PLANOS
+// =========================
 
-Route::middleware([CheckIsNotLogged::class])->group(function(){
-    Route::get('/alunos/create', [AuthController::class, 'cadastro'])->name('cadastrar');
-    Route::get('/login', [AuthController::class, 'login'])->name('login');
-    Route::post('/login-submit', [AuthController::class, 'loginSubmit'])->name('login.submit');
-    Route::get('/cadastro',[AuthController::class, 'cadastro']);
-});
-Route::post('/alunos', [AuthController::class, 'salvar'])->name('alunos.salvar');
-Route::get('/alunos', [MainController::class, 'index'])->name('alunos.index');
+// Listar planos
+Route::get('/planos', [PlanoController::class, 'index']);
+
+// Formulário para cadastrar
+Route::get('/planos/cadastrar', [PlanoController::class, 'create']);
+
+// Salvar novo plano
+Route::post('/planos/cadastrar', [PlanoController::class, 'store']);
+
+// Visualizar um plano
+Route::get('/planos/{id}', [PlanoController::class, 'show']);
+
+// Formulário para editar
+Route::get('/planos/{id}/editar', [PlanoController::class, 'edit']);
+
+// Atualizar plano
+Route::post('/planos/{id}/editar', [PlanoController::class, 'update']);
+
+// Excluir plano
+Route::post('/planos/{id}/excluir', [PlanoController::class, 'destroy']);
