@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plano extends Model
 {
-    use HasFactory;
-    
     protected $fillable = [
         'nome',
         'descricao',
@@ -17,9 +15,8 @@ class Plano extends Model
         'status',
     ];
 
-    public function alunos()
+    public function alunos(): HasMany
     {
-        // precisa da classe ALuno
-        // return $this->hasMany(Aluno::class);
+        return $this->hasMany(Aluno::class);
     }
 }

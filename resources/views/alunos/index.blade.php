@@ -9,21 +9,21 @@
     <div>
 
         <h1 class="h3 fw-bold mb-1">
-            Planos
+            Alunos
         </h1>
 
         <p class="text-secondary mb-0">
-            Gerencie os planos disponíveis.
+            Gerencie os alunos cadastrados no sistema.
         </p>
 
     </div>
 
     <a
-        href="{{ route('planos.create') }}"
+        href="{{ route('alunos.create') }}"
         class="btn btn-primary">
 
-        <i class="bi bi-plus-lg me-1"></i>
-        Novo plano
+        <i class="bi bi-person-plus me-1"></i>
+        Novo aluno
 
     </a>
 
@@ -33,7 +33,7 @@
 
     <div class="card-body p-0">
 
-        @if($planos->count())
+        @if($alunos->count())
 
             <div class="table-responsive">
 
@@ -48,23 +48,19 @@
                             </th>
 
                             <th>
-                                Descrição
+                                E-mail
                             </th>
 
                             <th>
-                                Preço
+                                Telefone
                             </th>
 
                             <th>
-                                Duração
+                                Plano
                             </th>
 
                             <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Alunos
+                                Objetivo
                             </th>
 
                             <th class="text-end pe-4">
@@ -77,54 +73,62 @@
 
                     <tbody>
 
-                        @foreach($planos as $plano)
+                        @foreach($alunos as $aluno)
 
                             <tr>
 
                                 <td class="ps-4">
 
-                                    <div class="fw-semibold">
-                                        {{ $plano->nome }}
+                                    <div class="d-flex align-items-center">
+
+                                        <div
+                                            class="bg-primary bg-opacity-10
+                                                   text-primary rounded-circle
+                                                   d-flex align-items-center
+                                                   justify-content-center
+                                                   me-3"
+                                            style="width: 40px; height: 40px;">
+
+                                            {{ strtoupper(substr($aluno->nome, 0, 1)) }}
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                {{ $aluno->nome }}
+                                            </div>
+
+                                            <small class="text-secondary">
+                                                ID #{{ $aluno->id }}
+                                            </small>
+
+                                        </div>
+
                                     </div>
 
-                                    <small class="text-secondary">
-                                        ID #{{ $plano->id }}
-                                    </small>
-
                                 </td>
 
                                 <td>
-                                    {{ $plano->descricao ?? 'Sem descrição' }}
+                                    {{ $aluno->email }}
                                 </td>
 
                                 <td>
-                                    R$ {{ number_format($plano->preco, 2, ',', '.') }}
-                                </td>
-
-                                <td>
-                                    {{ $plano->duracao_dias }} dias
+                                    {{ $aluno->telefone }}
                                 </td>
 
                                 <td>
 
-                                    @if($plano->status === 'ativo')
+                                    <span class="badge text-bg-primary">
 
-                                        <span class="badge text-bg-success">
-                                            Ativo
-                                        </span>
+                                        {{ $aluno->plano->nome }}
 
-                                    @else
-
-                                        <span class="badge text-bg-secondary">
-                                            Inativo
-                                        </span>
-
-                                    @endif
+                                    </span>
 
                                 </td>
 
                                 <td>
-                                    {{ $plano->alunos_count }}
+                                    {{ \Illuminate\Support\Str::limit($aluno->objetivo, 30) }}
                                 </td>
 
                                 <td class="text-end pe-4">
@@ -132,7 +136,7 @@
                                     <div class="btn-group">
 
                                         <a
-                                            href="{{ route('planos.show', $plano->id_encriptado) }}"
+                                            href="{{ route('alunos.show', $aluno->id_encriptado) }}"
                                             class="btn btn-sm btn-outline-secondary">
 
                                             Ver
@@ -140,7 +144,7 @@
                                         </a>
 
                                         <a
-                                            href="{{ route('planos.edit', $plano->id_encriptado) }}"
+                                            href="{{ route('alunos.edit', $aluno->id_encriptado) }}"
                                             class="btn btn-sm btn-outline-primary">
 
                                             Editar
@@ -148,9 +152,9 @@
                                         </a>
 
                                         <form
-                                            action="{{ route('planos.destroy', $plano->id_encriptado) }}"
+                                            action="{{ route('alunos.destroy', $aluno->id_encriptado) }}"
                                             method="POST"
-                                            onsubmit="return confirm('Deseja realmente excluir este plano?')">
+                                            onsubmit="return confirm('Deseja realmente excluir este aluno?')">
 
                                             @csrf
 
@@ -182,17 +186,21 @@
 
             <div class="text-center py-5">
 
-                <i class="bi bi-card-list fs-1 text-secondary"></i>
+                <i class="bi bi-people fs-1 text-secondary"></i>
 
                 <h2 class="h5 mt-3">
-                    Nenhum plano cadastrado
+                    Nenhum aluno cadastrado
                 </h2>
 
+                <p class="text-secondary">
+                    Comece cadastrando o primeiro aluno.
+                </p>
+
                 <a
-                    href="{{ route('planos.create') }}"
+                    href="{{ route('alunos.create') }}"
                     class="btn btn-primary">
 
-                    Cadastrar plano
+                    Cadastrar aluno
 
                 </a>
 
