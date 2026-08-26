@@ -5,19 +5,17 @@
 <div class="mb-4">
 
     <a
-        href="{{ route('planos.index') }}"
+        href="{{ route('alunos.index') }}"
         class="text-decoration-none small">
-
-        ← Voltar para planos
-
+        ← Voltar para alunos
     </a>
 
     <h1 class="h3 fw-bold mt-2 mb-1">
-        Editar plano
+        Novo aluno
     </h1>
 
     <p class="text-secondary mb-0">
-        Atualize os dados do plano.
+        Cadastre um novo aluno no sistema.
     </p>
 
 </div>
@@ -28,7 +26,7 @@
 
         <form
             method="POST"
-            action="{{ route('planos.update', $plano->id_encriptado) }}">
+            action="{{ route('alunos.store') }}">
 
             @csrf
 
@@ -37,13 +35,13 @@
                 <div class="col-md-6 mb-3">
 
                     <label class="form-label">
-                        Nome
+                        Nome completo
                     </label>
 
                     <input
                         type="text"
                         name="nome"
-                        value="{{ old('nome', $plano->nome) }}"
+                        value="{{ old('nome') }}"
                         class="form-control @error('nome') is-invalid @enderror"
                         required>
 
@@ -58,38 +56,17 @@
                 <div class="col-md-6 mb-3">
 
                     <label class="form-label">
-                        Preço
+                        E-mail
                     </label>
 
                     <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        name="preco"
-                        value="{{ old('preco', $plano->preco) }}"
-                        class="form-control @error('preco') is-invalid @enderror"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        class="form-control @error('email') is-invalid @enderror"
                         required>
 
-                    @error('preco')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-
-                </div>
-
-                <div class="col-12 mb-3">
-
-                    <label class="form-label">
-                        Descrição
-                    </label>
-
-                    <textarea
-                        name="descricao"
-                        rows="3"
-                        class="form-control @error('descricao') is-invalid @enderror">{{ old('descricao', $plano->descricao) }}</textarea>
-
-                    @error('descricao')
+                    @error('email')
                         <div class="invalid-feedback">
                             {{ $message }}
                         </div>
@@ -100,18 +77,58 @@
                 <div class="col-md-6 mb-3">
 
                     <label class="form-label">
-                        Duração em dias
+                        Telefone
                     </label>
 
                     <input
-                        type="number"
-                        min="1"
-                        name="duracao_dias"
-                        value="{{ old('duracao_dias', $plano->duracao_dias) }}"
-                        class="form-control @error('duracao_dias') is-invalid @enderror"
+                        type="text"
+                        name="telefone"
+                        value="{{ old('telefone') }}"
+                        class="form-control @error('telefone') is-invalid @enderror"
                         required>
 
-                    @error('duracao_dias')
+                    @error('telefone')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Data de nascimento
+                    </label>
+
+                    <input
+                        type="date"
+                        name="data_nascimento"
+                        value="{{ old('data_nascimento') }}"
+                        class="form-control @error('data_nascimento') is-invalid @enderror"
+                        required>
+
+                    @error('data_nascimento')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                </div>
+
+                <div class="col-12 mb-3">
+
+                    <label class="form-label">
+                        Objetivo
+                    </label>
+
+                    <textarea
+                        name="objetivo"
+                        rows="3"
+                        class="form-control @error('objetivo') is-invalid @enderror"
+                        required>{{ old('objetivo') }}</textarea>
+
+                    @error('objetivo')
                         <div class="invalid-feedback">
                             {{ $message }}
                         </div>
@@ -122,29 +139,34 @@
                 <div class="col-md-6 mb-4">
 
                     <label class="form-label">
-                        Status
+                        Plano
                     </label>
 
                     <select
-                        name="status"
-                        class="form-select @error('status') is-invalid @enderror"
+                        name="plano_id"
+                        class="form-select @error('plano_id') is-invalid @enderror"
                         required>
 
-                        <option
-                            value="ativo"
-                            @selected(old('status', $plano->status) === 'ativo')>
-                            Ativo
+                        <option value="">
+                            Selecione um plano
                         </option>
 
-                        <option
-                            value="inativo"
-                            @selected(old('status', $plano->status) === 'inativo')>
-                            Inativo
-                        </option>
+                        @foreach($planos as $plano)
+
+                            <option
+                                value="{{ $plano->id }}"
+                                @selected(old('plano_id') == $plano->id)>
+
+                                {{ $plano->nome }} -
+                                R$ {{ number_format($plano->preco, 2, ',', '.') }}
+
+                            </option>
+
+                        @endforeach
 
                     </select>
 
-                    @error('status')
+                    @error('plano_id')
                         <div class="invalid-feedback">
                             {{ $message }}
                         </div>
@@ -159,17 +181,13 @@
                 <button
                     type="submit"
                     class="btn btn-primary">
-
-                    Salvar alterações
-
+                    Cadastrar aluno
                 </button>
 
                 <a
-                    href="{{ route('planos.index') }}"
+                    href="{{ route('alunos.index') }}"
                     class="btn btn-outline-secondary">
-
                     Cancelar
-
                 </a>
 
             </div>

@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plano;
-use Illuminate\Http\Request;
 use App\Services\Operations;
+use Illuminate\Http\Request;
 
 class PlanoController extends Controller
 {
     public function index()
     {
-        $planos = Plano::all();
+        $planos = Plano::withCount('alunos')
+            ->orderBy('nome')
+            ->get();
 
         foreach ($planos as $plano) {
             $plano->id_encriptado = Operations::encryptId($plano->id);
@@ -26,17 +28,32 @@ class PlanoController extends Controller
 
     public function store(Request $request)
     {
-        $dados = $request->validate([
-            'nome' => 'required',
-            'descricao' => 'nullable',
-            'preco' => 'required|numeric',
-            'duracao_dias' => 'required|integer',
-            'status' => 'required',
-        ]);
+        $dados = $request->validate(
+            [
+                'nome' => 'required|string|max:255',
+                'descricao' => 'nullable|string|max:1000',
+                'preco' => 'required|numeric|min:0',
+                'duracao_dias' => 'required|integer|min:1',
+                'status' => 'required|in:ativo,inativo',
+            ],
+            [
+                'nome.required' => 'O nome do plano é obrigatório.',
+                'preco.required' => 'O preço é obrigatório.',
+                'preco.numeric' => 'O preço deve ser numérico.',
+                'preco.min' => 'O preço não pode ser negativo.',
+                'duracao_dias.required' => 'A duração é obrigatória.',
+                'duracao_dias.integer' => 'A duração deve ser um número inteiro.',
+                'duracao_dias.min' => 'A duração deve ser de pelo menos 1 dia.',
+                'status.required' => 'O status é obrigatório.',
+                'status.in' => 'O status selecionado é inválido.',
+            ]
+        );
 
         Plano::create($dados);
 
-        return redirect('/planos');
+        return redirect()
+            ->route('planos.index')
+            ->with('success', 'Plano cadastrado com sucesso!');
     }
 
     public function show($id)
@@ -47,14 +64,16 @@ class PlanoController extends Controller
             abort(404);
         }
 
-        $plano = Plano::findOrFail($id);
+        $plano = Plano::withCount('alunos')
+            ->findOrFail($id);
+
+        $plano->id_encriptado = Operations::encryptId($plano->id);
 
         return view('planos.show', compact('plano'));
     }
 
     public function edit($id)
     {
-
         $id = Operations::decryptId($id);
 
         if (!$id) {
@@ -78,17 +97,31 @@ class PlanoController extends Controller
 
         $plano = Plano::findOrFail($id);
 
-        $dados = $request->validate([
-            'nome' => 'required|string|max:255',
-            'descricao' => 'nullable|string',
-            'preco' => 'required|numeric|min:0',
-            'duracao_dias' => 'required|integer|min:1',
-            'status' => 'required|in:ativo,inativo',
-        ]);
+        $dados = $request->validate(
+            [
+                'nome' => 'required|string|max:255',
+                'descricao' => 'nullable|string|max:1000',
+                'preco' => 'required|numeric|min:0',
+                'duracao_dias' => 'required|integer|min:1',
+                'status' => 'required|in:ativo,inativo',
+            ],
+            [
+                'nome.required' => 'O nome do plano é obrigatório.',
+                'preco.required' => 'O preço é obrigatório.',
+                'preco.numeric' => 'O preço deve ser numérico.',
+                'preco.min' => 'O preço não pode ser negativo.',
+                'duracao_dias.required' => 'A duração é obrigatória.',
+                'duracao_dias.integer' => 'A duração deve ser um número inteiro.',
+                'duracao_dias.min' => 'A duração deve ser de pelo menos 1 dia.',
+                'status.required' => 'O status é obrigatório.',
+                'status.in' => 'O status selecionado é inválido.',
+            ]
+        );
 
         $plano->update($dados);
 
-        return redirect('/planos')
+        return redirect()
+            ->route('planos.index')
             ->with('success', 'Plano atualizado com sucesso!');
     }
 
@@ -102,9 +135,16 @@ class PlanoController extends Controller
 
         $plano = Plano::findOrFail($id);
 
+        if ($plano->alunos()->exists()) {
+            return redirect()
+                ->route('planos.index')
+                ->with('error', 'Não é possível excluir um plano que possui alunos.');
+        }
+
         $plano->delete();
 
-        return redirect('/planos')
+        return redirect()
+            ->route('planos.index')
             ->with('success', 'Plano excluído com sucesso!');
     }
 }

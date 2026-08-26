@@ -5,10 +5,10 @@
 <div class="mb-4">
 
     <a
-        href="{{ route('planos.index') }}"
+        href="{{ route('alunos.index') }}"
         class="text-decoration-none small">
 
-        ← Voltar para planos
+        ← Voltar para alunos
 
     </a>
 
@@ -17,17 +17,17 @@
         <div>
 
             <h1 class="h3 fw-bold mb-1">
-                {{ $plano->nome }}
+                {{ $aluno->nome }}
             </h1>
 
             <p class="text-secondary mb-0">
-                Detalhes do plano
+                Detalhes do aluno
             </p>
 
         </div>
 
         <a
-            href="{{ route('planos.edit', $plano->id_encriptado) }}"
+            href="{{ route('alunos.edit', $aluno->id_encriptado) }}"
             class="btn btn-primary">
 
             Editar
@@ -51,7 +51,7 @@
                 </small>
 
                 <div class="fw-semibold">
-                    {{ $plano->nome }}
+                    {{ $aluno->nome }}
                 </div>
 
             </div>
@@ -59,11 +59,11 @@
             <div class="col-md-6">
 
                 <small class="text-secondary">
-                    Preço
+                    E-mail
                 </small>
 
                 <div class="fw-semibold">
-                    R$ {{ number_format($plano->preco, 2, ',', '.') }}
+                    {{ $aluno->email }}
                 </div>
 
             </div>
@@ -71,11 +71,11 @@
             <div class="col-md-6">
 
                 <small class="text-secondary">
-                    Duração
+                    Telefone
                 </small>
 
                 <div class="fw-semibold">
-                    {{ $plano->duracao_dias }} dias
+                    {{ $aluno->telefone }}
                 </div>
 
             </div>
@@ -83,37 +83,35 @@
             <div class="col-md-6">
 
                 <small class="text-secondary">
-                    Status
-                </small>
-
-                <div>
-
-                    @if($plano->status === 'ativo')
-
-                        <span class="badge text-bg-success">
-                            Ativo
-                        </span>
-
-                    @else
-
-                        <span class="badge text-bg-secondary">
-                            Inativo
-                        </span>
-
-                    @endif
-
-                </div>
-
-            </div>
-
-            <div class="col-md-6">
-
-                <small class="text-secondary">
-                    Alunos vinculados
+                    Data de nascimento
                 </small>
 
                 <div class="fw-semibold">
-                    {{ $plano->alunos_count }}
+                    {{ $aluno->data_nascimento->format('d/m/Y') }}
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <small class="text-secondary">
+                    Plano
+                </small>
+
+                <div class="fw-semibold">
+                    {{ $aluno->plano->nome }}
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <small class="text-secondary">
+                    Preço do plano
+                </small>
+
+                <div class="fw-semibold">
+                    R$ {{ number_format($aluno->plano->preco, 2, ',', '.') }}
                 </div>
 
             </div>
@@ -121,11 +119,23 @@
             <div class="col-12">
 
                 <small class="text-secondary">
-                    Descrição
+                    Objetivo
                 </small>
 
                 <div class="fw-semibold">
-                    {{ $plano->descricao ?? 'Sem descrição.' }}
+                    {{ $aluno->objetivo }}
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <small class="text-secondary">
+                    Cadastro
+                </small>
+
+                <div class="fw-semibold">
+                    {{ $aluno->created_at->format('d/m/Y H:i') }}
                 </div>
 
             </div>

@@ -3,18 +3,34 @@
 namespace Database\Seeders;
 
 use App\Models\Plano;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PlanoSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
-    { 
-        {
-            Plano::factory()->count(10)->create();
-        }
+    {
+        Plano::create([
+            'nome' => 'Plano Básico',
+            'descricao' => 'Acesso básico à academia.',
+            'preco' => 49.90,
+            'duracao_dias' => 30,
+            'status' => 'ativo',
+        ]);
+
+        Plano::create([
+            'nome' => 'Plano Intermediário',
+            'descricao' => 'Acesso completo à academia.',
+            'preco' => 79.90,
+            'duracao_dias' => 30,
+            'status' => 'ativo',
+        ]);
+
+        Plano::create([
+            'nome' => 'Plano Premium',
+            'descricao' => 'Acesso completo com benefícios adicionais.',
+            'preco' => 119.90,
+            'duracao_dias' => 30,
+            'status' => 'ativo',
+        ]);
     }
 }
