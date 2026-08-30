@@ -6,32 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('alunos', function (Blueprint $table) {
-
             $table->id();
-
-            $table->string('nome');
-
+            $table->string('name',50)->unique();
+            $table->string('password',100);
             $table->string('email')->unique();
-
-            $table->string('telefone');
-
-            $table->date('data_nascimento');
-
-            $table->text('objetivo');
-
-            $table->foreignId('plano_id')
-                ->constrained('planos')
-                ->restrictOnDelete();
-
-            $table->timestamps();
-
-            $table->softDeletes();
+            $table->string('cpf')->unique()->nullable();
+            $table->dateTime('last_login')->nullable();
+            $table->timestamps(); //created_at updated_at
+            $table->softDeletes(); //deleted_at
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('alunos');

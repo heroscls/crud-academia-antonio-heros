@@ -3,156 +3,190 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
-use App\Models\Plano;
 use App\Services\Operations;
 use Illuminate\Http\Request;
 
 class AlunoController extends Controller
 {
-    public function index()
-    {
-        $alunos = Aluno::with('plano')
-            ->latest()
-            ->get();
 
-        foreach ($alunos as $aluno) {
-            $aluno->id_encriptado = Operations::encryptId($aluno->id);
-        }
-
-        return view('alunos.index', compact('alunos'));
+    public function login(){
+        return view('alunos/login');
     }
 
-    public function create()
-    {
-        $planos = Plano::where('status', 'ativo')
-            ->orderBy('nome')
-            ->get();
-
-        return view('alunos.create', compact('planos'));
+    public function cadastro() {
+        return view('alunos/new_aluno');
     }
 
-    public function store(Request $request)
+    public function salvar(Request $request) 
     {
-        $dados = $request->validate(
+       $request->validate([
+            'name'     => 'required|string|max:50|unique:alunos,name', 
+            'email'    => 'required|string|email|max:255|unique:alunos,email',
+            'cpf'      => 'required|string|unique:alunos,cpf|digits:11',
+            'password' => 'required|string|min:6',
+        ], [
+            'name.required'     => 'O campo Nome é obrigatório.',
+            'name.max'          => 'O nome não pode ultrapassar 50 caracteres.',
+            'name.unique'       => 'Este nome de usuário já está em uso.', // <-- Nova mensagem de erro
+            'email.required'    => 'O campo E-mail é obrigatório.',
+            'email.email'       => 'Digite um e-mail válido.',
+            'email.unique'      => 'Este e-mail já está cadastrado.',
+            'cpf.required'      => 'O campo CPF é obrigatório.',
+            'cpf.unique'        => 'Este CPF já está cadastrado.',
+            'password.required' => 'A senha é obrigatória.',
+            'password.min'      => 'A senha deve ter no mínimo 6 caracteres.',
+        ]);
+
+        $cpfLimpo = preg_replace('/[^0-9]/', '', $request->cpf);
+
+        Aluno::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'cpf'      => $cpfLimpo,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        ]);
+
+        return redirect('login');
+    }
+
+    public function loginSubmit(Request $request){
+
+        $request->validate(
             [
-                'nome' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:alunos,email',
-                'telefone' => 'required|string|max:20',
-                'data_nascimento' => 'required|date',
-                'objetivo' => 'required|string|max:1000',
-                'plano_id' => 'required|exists:planos,id',
+                'name' => 'required|min:3',
+                'password' => 'required|min:6',
             ],
             [
-                'nome.required' => 'O nome é obrigatório.',
-                'email.required' => 'O e-mail é obrigatório.',
-                'email.email' => 'Informe um e-mail válido.',
-                'email.unique' => 'Este e-mail já está cadastrado.',
-                'telefone.required' => 'O telefone é obrigatório.',
-                'data_nascimento.required' => 'A data de nascimento é obrigatória.',
-                'data_nascimento.date' => 'Informe uma data válida.',
-                'objetivo.required' => 'O objetivo é obrigatório.',
-                'plano_id.required' => 'Selecione um plano.',
-                'plano_id.exists' => 'O plano selecionado não existe.',
+                'name.required' => 'O campo name é obrigatório.',
+                'name.min' => 'O campo name deve ter no mínimo 3 caracteres',
+
+                'password.required' => 'O campo password é obrigatório.',
+                'password.min' => 'O campo password deve ter no mínimo 6 caracteres',
+
             ]
         );
+        $name = $request->input('name');
+        $password = $request->input('password');
 
-        Aluno::create($dados);
 
-        return redirect()
-            ->route('alunos.index')
-            ->with('success', 'Aluno cadastrado com sucesso!');
-    }
+        $aluno = Aluno::where('name',$name)
+                    ->whereNull('deleted_at')
+                    ->first();
 
-    public function show($id)
-    {
-        $id = Operations::decryptId($id);
-
-        if (!$id) {
-            abort(404);
+        if(!$aluno){
+            return redirect()->back()
+                    ->withInput()
+                    ->with('login_error','name ou password incorretos!');
+        } else {
+            if(!password_verify($password,$aluno->password)){
+                return redirect()->back()
+                        ->withInput()
+                        ->with('login_error','name ou password incorretos!');
+            }
         }
-
-        $aluno = Aluno::with('plano')
-            ->findOrFail($id);
-
-        $aluno->id_encriptado = Operations::encryptId($aluno->id);
-
-        return view('alunos.show', compact('aluno'));
-    }
-
-    public function edit($id)
-    {
-        $id = Operations::decryptId($id);
-
-        if (!$id) {
-            abort(404);
-        }
-
-        $aluno = Aluno::findOrFail($id);
-
-        $planos = Plano::where('status', 'ativo')
-            ->orWhere('id', $aluno->plano_id)
-            ->orderBy('nome')
-            ->get();
-
-        $aluno->id_encriptado = Operations::encryptId($aluno->id);
-
-        return view('alunos.edit', compact('aluno', 'planos'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $id = Operations::decryptId($id);
-
-        if (!$id) {
-            abort(404);
-        }
-
-        $aluno = Aluno::findOrFail($id);
-
-        $dados = $request->validate(
-            [
-                'nome' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:alunos,email,' . $aluno->id,
-                'telefone' => 'required|string|max:20',
-                'data_nascimento' => 'required|date',
-                'objetivo' => 'required|string|max:1000',
-                'plano_id' => 'required|exists:planos,id',
-            ],
-            [
-                'nome.required' => 'O nome é obrigatório.',
-                'email.required' => 'O e-mail é obrigatório.',
-                'email.email' => 'Informe um e-mail válido.',
-                'email.unique' => 'Este e-mail já está cadastrado.',
-                'telefone.required' => 'O telefone é obrigatório.',
-                'data_nascimento.required' => 'A data de nascimento é obrigatória.',
-                'data_nascimento.date' => 'Informe uma data válida.',
-                'objetivo.required' => 'O objetivo é obrigatório.',
-                'plano_id.required' => 'Selecione um plano.',
-                'plano_id.exists' => 'O plano selecionado não existe.',
+        
+        $aluno->last_login = date('Y-m-d H:i:s');
+        $aluno->save();
+        session([
+            'aluno' => [
+                'id' => $aluno->id,
+                'name' => $aluno->name,
             ]
-        );
+        ]);
 
-        $aluno->update($dados);
+        return redirect()->route('alunos.index');
 
-        return redirect()
-            ->route('alunos.index')
-            ->with('success', 'Aluno atualizado com sucesso!');
+    }
+
+
+
+    public function logout(){
+        session()->forget('aluno');
+
+       return redirect()->route('login');
+    }
+
+    public function editAluno($id)
+    {
+        // Desencripta o ID
+        $decrypted_id = Operations::decryptId($id);
+        
+        // Busca o aluno
+        $aluno = Aluno::find($decrypted_id);
+
+        if(!$aluno) {
+            return redirect()->route('alunos.index');
+        }
+
+        return view('alunos.edit-aluno', ['aluno' => $aluno]);
+    }
+
+    public function editAlunoSubmit(Request $request)
+    {
+        // Verifica se o ID foi enviado
+        if ($request->aluno_id === null) {
+            return redirect()->route('alunos.index');
+        }
+
+        $id = Operations::decryptId($request->aluno_id);
+
+        // Validação
+        $request->validate([
+            'name'     => 'required|string|max:50',
+            'email'    => 'required|string|email|max:255|unique:alunos,email,' . $id,
+            'cpf'      => 'required|string|digits:11|unique:alunos,cpf,' . $id,
+            'password' => 'nullable|string|min:6',
+        ], [
+            'name.required'     => 'O campo Nome é obrigatório.',
+            'name.max'          => 'O nome não pode ultrapassar 50 caracteres.',
+            'email.required'    => 'O campo E-mail é obrigatório.',
+            'email.email'       => 'Digite um e-mail válido.',
+            'email.unique'      => 'Este e-mail já está cadastrado.',
+            'cpf.required'      => 'O campo CPF é obrigatório.',
+            'cpf.unique'        => 'Este CPF já está cadastrado.',
+            'password.min'      => 'A senha deve ter no mínimo 6 caracteres.',
+        ]);
+
+        $aluno = Aluno::find($id);
+        
+        if (!$aluno) {
+            return redirect()->route('alunos.index');
+        }
+
+        $cpfLimpo = preg_replace('/[^0-9]/', '', $request->cpf);
+
+        // Atualiza os dados
+        $aluno->name  = $request->name;
+        $aluno->email = $request->email;
+        $aluno->cpf   = $cpfLimpo;
+        
+        if (!empty($request->password)) {
+            $aluno->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        }
+
+        $aluno->save();
+
+        // Redireciona para a listagem de alunos
+        return redirect()->route('alunos.index');
     }
 
     public function destroy($id)
     {
-        $id = Operations::decryptId($id);
+        $alunoId = Operations::decryptId($id);
+        $aluno = Aluno::find($alunoId);
+        return view('alunos.delete-aluno', ['aluno' => $aluno]);
+    }
 
-        if (!$id) {
-            abort(404);
+    public function deleteAlunoConfirm($id)
+    {
+        $alunoId = Operations::decryptId($id);
+        $aluno = Aluno::find($alunoId);
+        if (!$aluno) {
+            return redirect()->route('alunos.index');
         }
-
-        $aluno = Aluno::findOrFail($id);
-
+        // Soft delete automático
         $aluno->delete();
-
-        return redirect()
-            ->route('alunos.index')
-            ->with('success', 'Aluno excluído com sucesso!');
+        //$note->forcedelete();
+        return redirect()->route('alunos.index');
     }
 }

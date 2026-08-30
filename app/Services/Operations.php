@@ -12,7 +12,7 @@ class Operations
         try {
             return Crypt::decrypt($value);
         } catch (DecryptException $e) {
-            return false;
+            return null;
         }
     }
 

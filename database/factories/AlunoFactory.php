@@ -3,28 +3,45 @@
 namespace Database\Factories;
 
 use App\Models\Aluno;
-use App\Models\Plano;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
+/**
+ * @extends Factory<Aluno>
+ */
 class AlunoFactory extends Factory
 {
-    protected $model = Aluno::class;
+   /**
+     * The current password being used by the factory.
+     */
+    protected static ?string $password;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
         return [
-            'nome' => fake()->name(),
+            'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'telefone' => fake()->phoneNumber(),
-            'data_nascimento' => fake()->dateTimeBetween('-40 years', '-18 years')->format('Y-m-d'),
-            'objetivo' => fake()->randomElement([
-                'Ganhar massa muscular',
-                'Perder peso',
-                'Melhorar condicionamento físico',
-                'Aumentar resistência',
-                'Melhorar qualidade de vida',
-            ]),
-            'plano_id' => Plano::inRandomOrder()->value('id'),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => str::random(10),
+            'cpf' => fake()->cpf(),
         ];
     }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
 }
+

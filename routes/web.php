@@ -1,101 +1,30 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlunoController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PlanoController;
+use App\Http\Controllers\MainController;
+use App\Http\Middleware\CheckIsLogged;
+use App\Http\Middleware\CheckIsNotLogged;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware([CheckIsLogged::class])->group(function () {
+    Route::get('/logout', [AlunoController::class, 'logout'])->name('logout');
+    Route::get('/alunos/listar', [MainController::class, 'index'])->name('alunos.index');
+    Route::get('/alunos/editar/{id}', [AlunoController::class, 'editAluno'])->name('alunos.edit');
+    Route::post('/alunos/editar', [AlunoController::class, 'editAlunoSubmit'])->name('alunos.editSubmit');
+    Route::get('/alunos/excluir/{id}', [AlunoController::class, 'destroy'])->name('alunos.destroy');
+    Route::get('/planos', [PlanoController::class, 'index'])->name('planos.index');
+    Route::get('/deleteAlunoConfirm/{id}', [AlunoController::class, 'deleteAlunoConfirm'])->name('deleteAlunoConfirm');
 
-// =========================
-// ROTAS PÚBLICAS
-// =========================
 
-Route::middleware('CheckIsNotLogged')->group(function () {
-
-    Route::get('/login', [AuthController::class, 'showLogin'])
-        ->name('login');
-
-    Route::post('/login', [AuthController::class, 'login'])
-        ->name('login.store');
-
-    Route::get('/cadastro', [AuthController::class, 'showRegister'])
-        ->name('register');
-
-    Route::post('/cadastro', [AuthController::class, 'register'])
-        ->name('register.store');
 });
 
 
-// =========================
-// ROTAS PRIVADAS
-// =========================
-
-Route::middleware('CheckIsLogged')->group(function () {
-
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
-
-    Route::get('/', [DashboardController::class, 'showDashboard'])
-        ->name('home');
-
-
-    // =========================
-    // DASHBOARD
-    // =========================
-
-    Route::get('/dashboard', [DashboardController::class, 'showDashboard'])
-        ->name('dashboard');
-
-
-    // =========================
-    // PLANOS
-    // =========================
-
-    Route::get('/planos', [PlanoController::class, 'index'])
-        ->name('planos.index');
-
-    Route::get('/planos/cadastrar', [PlanoController::class, 'create'])
-        ->name('planos.create');
-
-    Route::post('/planos/cadastrar', [PlanoController::class, 'store'])
-        ->name('planos.store');
-
-    Route::get('/planos/{id}', [PlanoController::class, 'show'])
-        ->name('planos.show');
-
-    Route::get('/planos/{id}/editar', [PlanoController::class, 'edit'])
-        ->name('planos.edit');
-
-    Route::post('/planos/{id}/editar', [PlanoController::class, 'update'])
-        ->name('planos.update');
-
-    Route::post('/planos/{id}/excluir', [PlanoController::class, 'destroy'])
-        ->name('planos.destroy');
-
-
-    // =========================
-    // ALUNOS
-    // =========================
-
-    Route::get('/alunos', [AlunoController::class, 'index'])
-        ->name('alunos.index');
-
-    Route::get('/alunos/cadastrar', [AlunoController::class, 'create'])
-        ->name('alunos.create');
-
-    Route::post('/alunos/cadastrar', [AlunoController::class, 'store'])
-        ->name('alunos.store');
-
-    Route::get('/alunos/{id}', [AlunoController::class, 'show'])
-        ->name('alunos.show');
-
-    Route::get('/alunos/{id}/editar', [AlunoController::class, 'edit'])
-        ->name('alunos.edit');
-
-    Route::post('/alunos/{id}/editar', [AlunoController::class, 'update'])
-        ->name('alunos.update');
-
-    Route::post('/alunos/{id}/excluir', [AlunoController::class, 'destroy'])
-        ->name('alunos.destroy');
-});
+Route::middleware([CheckIsNotLogged::class])->group(function(){
+    Route::get('/cadastro',[AlunoController::class, 'cadastro']);
+    
+    });
+    Route::post('/login-submit', [AlunoController::class, 'loginSubmit'])->name('login.submit');
+    Route::get('/alunos/create', [AlunoController::class, 'cadastro'])->name('cadastrar');
+    Route::get('/login', [AlunoController::class, 'login'])->name('login');
+    Route::post('/alunos', [AlunoController::class, 'salvar'])->name('alunos.salvar');

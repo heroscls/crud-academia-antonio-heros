@@ -4,24 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Prompts\Note;
 
 class Aluno extends Model
 {
-    use HasFactory, SoftDeletes;
-
+    use HasFactory;
     protected $fillable = [
-        'nome',
+        'name',
         'email',
-        'telefone',
-        'data_nascimento',
-        'objetivo',
-        'plano_id',
+        'password',
+        'cpf',
     ];
-
-    public function plano(): BelongsTo
+    public function planos()
     {
-        return $this->belongsTo(Plano::class);
+        return $this->hasMany(Plano::class);
     }
+
 }
