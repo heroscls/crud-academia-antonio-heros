@@ -15,7 +15,7 @@ class CheckIsLogged
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!session()->has('user')){
+        if(!session()->has('aluno')){
             return redirect()->route('login');
         }
         return $next($request);

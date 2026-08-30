@@ -17,7 +17,7 @@ class AlunoSeeder extends Seeder
         DB::table('alunos')->insert([
             'name' => 'antonio',
             'email' => 'antonio@exemplo.com',
-            'password' => bcrypt('slaman123'),
+            'password' => bcrypt('sla123')
         ]);
     }
 }
