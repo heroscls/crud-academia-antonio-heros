@@ -2,104 +2,111 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Aluno;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login(){
-        return view('login');
-    }
-
-    public function cadastro() {
-        return view('new_aluno');
-    }
-
-    public function salvar(Request $request) 
+    public function showLogin()
     {
-        $request->validate([
-            'name'     => 'required|string|max:50',
-            'email'    => 'required|string|email|max:255|unique:alunos,email',
-            'cpf'      => 'required|string|unique:alunos,cpf',
-            'password' => 'required|string|min:6',
-        ], [
-            'name.required'     => 'O campo Nome é obrigatório.',
-            'name.max'          => 'O nome não pode ultrapassar 50 caracteres.',
-            'email.required'    => 'O campo E-mail é obrigatório.',
-            'email.email'       => 'Digite um e-mail válido.',
-            'email.unique'      => 'Este e-mail já está cadastrado.',
-            'cpf.required'      => 'O campo CPF é obrigatório.',
-            'cpf.unique'        => 'Este CPF já está cadastrado.',
-            'password.required' => 'A senha é obrigatória.',
-            'password.min'      => 'A senha deve ter no mínimo 6 caracteres.',
-        ]);
-
-        $cpfLimpo = preg_replace('/[^0-9]/', '', $request->cpf);
-
-        Aluno::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'cpf'      => $cpfLimpo,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-        ]);
-
-        return redirect('login');
+        return view('auth.login');
     }
 
-    public function loginSubmit(Request $request){
-
-        $request->validate(
+    public function login(Request $request)
+    {
+        $credentials = $request->validate(
             [
-                'text_name' => 'required|min:3',
-                'text_password' => 'required|min:8',
+                'email' => ['required', 'email'],
+                'password' => ['required'],
             ],
             [
-                'text_name.required' => 'O campo name é obrigatório.',
-                'text_name.min' => 'O campo name deve ter no mínimo 3 caracteres',
-
-                'text_password.required' => 'O campo password é obrigatório.',
-                'text_password.min' => 'O campo password deve ter no mínimo 8 caracteres',
-
+                'email.required' => 'O e-mail é obrigatório.',
+                'email.email' => 'Informe um e-mail válido.',
+                'password.required' => 'A senha é obrigatória.',
             ]
         );
-        $name = $request->input('text_name');
-        $password = $request->input('text_password');
 
+        $remember = $request->boolean('remember');
 
-        $aluno = Aluno::where('name',$name)
-                    ->whereNull('deleted_at')
-                    ->first();
+        if (Auth::attempt($credentials, $remember)) {
 
-        if(!$aluno){
-            return redirect()->back()
-                    ->withInput()
-                    ->with('login_error','name ou password incorretos!');
-        } else {
-            if(!password_verify($password,$aluno->password)){
-                return redirect()->back()
-                        ->withInput()
-                        ->with('login_error','name ou password incorretos!');
-            }
+            $request->session()->regenerate();
+
+            return redirect()->route('home');
         }
-        
-        $aluno->last_login = date('Y-m-d H:i:s');
-        $aluno->save();
-        session([
-            'aluno' => [
-                'id' => $aluno->id,
-                'name' => $aluno->name,
-            ]
-        ]);
 
-        return redirect('/index');
-
+        return back()
+            ->withErrors([
+                'email' => 'As credenciais informadas estão incorretas.',
+            ])
+            ->onlyInput('email');
     }
 
+    public function showHome()
+    {
+        return view('home');
+    }
 
+    public function showRegister()
+    {
+        return view('auth.cadastro');
+    }
 
-    public function logout(){
-        session()->forget('aluno');
+    public function register(Request $request)
+    {
+        $validated = $request->validate(
+            [
+                'name' => ['required', 'string', 'max:255'],
 
-       return redirect()->route('login');
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    'unique:users,email',
+                ],
+
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'confirmed',
+                ],
+            ],
+            [
+                'name.required' => 'O nome é obrigatório.',
+                'email.required' => 'O e-mail é obrigatório.',
+                'email.email' => 'Informe um e-mail válido.',
+                'email.unique' => 'Este e-mail já está cadastrado.',
+                'password.required' => 'A senha é obrigatória.',
+                'password.min' => 'A senha deve ter pelo menos 8 caracteres.',
+                'password.confirmed' => 'As senhas não coincidem.',
+            ]
+        );
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        Auth::login($user);
+
+        $request->session()->regenerate();
+
+        return redirect()->route('home');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }
