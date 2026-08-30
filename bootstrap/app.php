@@ -5,7 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckIsLogged;
 use App\Http\Middleware\CheckIsNotLogged;
-use App\Http\Middleware\CheckIsAdmin;       
+    
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
