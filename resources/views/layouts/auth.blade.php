@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $title ?? 'Login' }} - Sistema</title>
+    <title>{{ $title ?? 'Login' }} - Fitly</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -26,12 +26,12 @@
                                     justify-content-center"
                             style="width: 48px; height: 48px;">
 
-                            <strong class="fs-5">S</strong>
+                            <strong class="fs-5">F</strong>
 
                         </div>
 
                         <h1 class="h3 fw-bold mt-3 mb-1">
-                            Sistema
+                            Fitly
                         </h1>
 
                         <p class="text-secondary mb-0">
@@ -51,7 +51,7 @@
                     </div>
 
                     <p class="text-center text-secondary small mt-4">
-                        © {{ date('Y') }} Sistema
+                        © {{ date('Y') }} Fitly
                     </p>
 
                 </div>
