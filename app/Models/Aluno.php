@@ -20,6 +20,10 @@ class Aluno extends Model
         'plano_id',
     ];
 
+     protected $casts = [
+        'data_nascimento' => 'date',
+    ];
+    
     public function plano(): BelongsTo
     {
         return $this->belongsTo(Plano::class);
