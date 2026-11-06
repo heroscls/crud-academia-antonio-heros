@@ -10,6 +10,7 @@ class PlanoController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Plano::class);
         $planos = Plano::withCount('alunos')
             ->orderBy('nome')
             ->get();
@@ -23,11 +24,13 @@ class PlanoController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Plano::class);
         return view('planos.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', Plano::class);
         $dados = $request->validate(
             [
                 'nome' => 'required|string|max:255',
@@ -67,6 +70,8 @@ class PlanoController extends Controller
         $plano = Plano::withCount('alunos')
             ->findOrFail($id);
 
+        $this->authorize('view', $plano);
+
         $plano->id_encriptado = Operations::encryptId($plano->id);
 
         return view('planos.show', compact('plano'));
@@ -81,6 +86,7 @@ class PlanoController extends Controller
         }
 
         $plano = Plano::findOrFail($id);
+        $this->authorize('update', $plano);
 
         $plano->id_encriptado = Operations::encryptId($plano->id);
 
@@ -96,6 +102,7 @@ class PlanoController extends Controller
         }
 
         $plano = Plano::findOrFail($id);
+        $this->authorize('update', $plano);
 
         $dados = $request->validate(
             [
@@ -134,6 +141,7 @@ class PlanoController extends Controller
         }
 
         $plano = Plano::findOrFail($id);
+        $this->authorize('delete', $plano);
 
         if ($plano->alunos()->exists()) {
             return redirect()

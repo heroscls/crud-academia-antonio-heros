@@ -11,6 +11,7 @@ class AlunoController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Aluno::class);
         $alunos = Aluno::with('plano')
             ->latest()
             ->get();
@@ -24,6 +25,7 @@ class AlunoController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Aluno::class);
         $planos = Plano::where('status', 'ativo')
             ->orderBy('nome')
             ->get();
@@ -33,6 +35,7 @@ class AlunoController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Aluno::class);
         $dados = $request->validate(
             [
                 'nome' => 'required|string|max:255',
@@ -73,9 +76,9 @@ class AlunoController extends Controller
 
         $aluno = Aluno::with('plano')
             ->findOrFail($id);
-
+            
+            $this->authorize('view', $aluno);
         $aluno->id_encriptado = Operations::encryptId($aluno->id);
-
         return view('alunos.show', compact('aluno'));
     }
 
@@ -88,7 +91,7 @@ class AlunoController extends Controller
         }
 
         $aluno = Aluno::findOrFail($id);
-
+        $this->authorize('update', $aluno);
         $planos = Plano::where('status', 'ativo')
             ->orWhere('id', $aluno->plano_id)
             ->orderBy('nome')
@@ -108,6 +111,7 @@ class AlunoController extends Controller
         }
 
         $aluno = Aluno::findOrFail($id);
+        $this->authorize('update', $aluno);
 
         $dados = $request->validate(
             [
@@ -148,7 +152,7 @@ class AlunoController extends Controller
         }
 
         $aluno = Aluno::findOrFail($id);
-
+        $this->authorize('delete', $aluno);
         $aluno->delete();
 
         return redirect()

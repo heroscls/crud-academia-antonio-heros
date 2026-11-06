@@ -26,6 +26,7 @@
 
         </div>
 
+        @can('update', $plano)
         <a
             href="{{ route('planos.edit', $plano->id_encriptado) }}"
             class="btn btn-primary">
@@ -33,6 +34,7 @@
             Editar
 
         </a>
+        @endcan
 
     </div>
 

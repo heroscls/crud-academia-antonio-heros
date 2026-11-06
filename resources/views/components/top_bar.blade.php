@@ -33,13 +33,11 @@
                         </a>
                     </li>
 
+                    @can('viewAny', App\Models\Aluno::class)
                     <li class="nav-item">
-                        <a
-                            href="{{ route('alunos.index') }}"
-                            class="nav-link">
-                            Alunos
-                        </a>
+                        <a href="{{ route('alunos.index') }}" class="nav-link">Alunos</a>
                     </li>
+                    @endcan
 
                     <li class="nav-item">
                         <a
