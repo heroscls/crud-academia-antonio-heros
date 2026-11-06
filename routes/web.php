@@ -87,6 +87,9 @@ Route::middleware('CheckIsLogged')->group(function () {
     Route::post('/alunos/cadastrar', [AlunoController::class, 'store'])
         ->name('alunos.store');
 
+    Route::get('/alunos/{id}/pdf', [AlunoController::class, 'pdf'])
+            ->name('alunos.pdf');
+
     Route::get('/alunos/{id}', [AlunoController::class, 'show'])
         ->name('alunos.show');
 

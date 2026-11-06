@@ -28,15 +28,28 @@
 
         </div>
 
-        @can('update', $aluno)
-        <a
-            href="{{ route('alunos.edit', $aluno->id_encriptado) }}"
-            class="btn btn-primary">
+                <div class="d-flex gap-2">
 
-            Editar
+            <a
+                href="{{ route('alunos.pdf', $aluno->id_encriptado) }}"
+                class="btn btn-outline-secondary">
 
-        </a>
-        @endcan
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                Baixar PDF
+
+            </a>
+
+            @can('update', $aluno)
+            <a
+                href="{{ route('alunos.edit', $aluno->id_encriptado) }}"
+                class="btn btn-primary">
+
+                Editar
+
+            </a>
+            @endcan
+
+        </div>
 
     </div>
 

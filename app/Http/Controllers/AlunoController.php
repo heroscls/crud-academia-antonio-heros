@@ -6,6 +6,7 @@ use App\Models\Aluno;
 use App\Models\Plano;
 use App\Services\Operations;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AlunoController extends Controller
 {
@@ -80,6 +81,23 @@ class AlunoController extends Controller
             $this->authorize('view', $aluno);
         $aluno->id_encriptado = Operations::encryptId($aluno->id);
         return view('alunos.show', compact('aluno'));
+    }
+
+    public function pdf($id)
+    {
+        $id = Operations::decryptId($id);
+
+        if (!$id) {
+            abort(404);
+        }
+
+        $aluno = Aluno::with('plano')->findOrFail($id);
+
+        $this->authorize('view', $aluno);
+
+        $pdf = Pdf::loadView('alunos.pdf', compact('aluno'));
+
+        return $pdf->download('ficha-aluno-' . $aluno->id . '.pdf');
     }
 
     public function edit($id)
