@@ -18,6 +18,7 @@
 
     </div>
 
+    @can('create', App\Models\Plano::class)
     <a
         href="{{ route('planos.create') }}"
         class="btn btn-primary">
@@ -26,6 +27,7 @@
         Novo plano
 
     </a>
+    @endcan
 
 </div>
 
@@ -139,6 +141,7 @@
 
                                         </a>
 
+                                        @can('update', $plano)
                                         <a
                                             href="{{ route('planos.edit', $plano->id_encriptado) }}"
                                             class="btn btn-sm btn-outline-primary">
@@ -146,7 +149,9 @@
                                             Editar
 
                                         </a>
+                                        @endcan
 
+                                        @can('delete', $plano)
                                         <form
                                             action="{{ route('planos.destroy', $plano->id_encriptado) }}"
                                             method="POST"
@@ -163,6 +168,7 @@
                                             </button>
 
                                         </form>
+                                        @endcan
 
                                     </div>
 
@@ -188,6 +194,7 @@
                     Nenhum plano cadastrado
                 </h2>
 
+                @can('create', App\Models\Plano::class)
                 <a
                     href="{{ route('planos.create') }}"
                     class="btn btn-primary">
@@ -195,6 +202,7 @@
                     Cadastrar plano
 
                 </a>
+                @endcan
 
             </div>
 

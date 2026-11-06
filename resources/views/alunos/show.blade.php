@@ -4,6 +4,7 @@
 
 <div class="mb-4">
 
+    @can('viewAny', App\Models\Aluno::class)
     <a
         href="{{ route('alunos.index') }}"
         class="text-decoration-none small">
@@ -11,6 +12,7 @@
         ← Voltar para alunos
 
     </a>
+    @endcan
 
     <div class="d-flex justify-content-between align-items-center mt-2">
 
@@ -26,6 +28,7 @@
 
         </div>
 
+        @can('update', $aluno)
         <a
             href="{{ route('alunos.edit', $aluno->id_encriptado) }}"
             class="btn btn-primary">
@@ -33,6 +36,7 @@
             Editar
 
         </a>
+        @endcan
 
     </div>
 

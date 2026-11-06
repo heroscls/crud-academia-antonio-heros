@@ -17,7 +17,7 @@
 
 
 <div class="row g-4">
-
+    @can('viewAny', App\Models\Aluno::class)
     {{-- Alunos --}}
 
     <div class="col-12 col-md-6 col-xl-3">
@@ -62,6 +62,7 @@
         </div>
 
     </div>
+    @endcan
 
     {{-- Planos --}}
     <div class="col-12 col-md-6 col-xl-3">
@@ -81,6 +82,7 @@
         </div>
     </div>
 
+    @can('ver-metricas-usuarios')
     {{-- Usuários --}}
 
     <div class="col-12 col-md-6 col-xl-3">
@@ -133,6 +135,7 @@
         </div>
 
     </div>
+    @endcan
 
 </div>
 
@@ -149,23 +152,29 @@
 
         <div class="d-flex flex-wrap gap-2">
 
+            @can('create', App\Models\Aluno::class)
             <a
                 href="{{ route('alunos.create') }}"
                 class="btn btn-primary">
                 <i class="bi bi-person-plus me-1"></i>
                 Novo aluno
             </a>
-
+            @endcan
+        
+            @can('viewAny', App\Models\Aluno::class)
             <a
                 href="{{ route('alunos.index') }}"
                 class="btn btn-outline-secondary">
                 <i class="bi bi-people me-1"></i>
                 Gerenciar alunos
             </a>
+            @endcan
 
+            @can('create', App\Models\Plano::class)
             <a href="{{ route('planos.create') }}" class="btn btn-outline-primary">
                 <i class="bi bi-plus-circle me-1"></i> Novo plano
             </a>
+            @endcan
             <a href="{{ route('planos.index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-card-checklist me-1"></i> Gerenciar planos
             </a>
